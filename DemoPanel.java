@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -20,21 +21,22 @@ public class DemoPanel extends JPanel {
     private int middleY;
     private Vec3D[] cube;
     float hue = 0;
-    double keyboardSpeed = Math.PI / 50;
+    double keyboardSpeed = Math.PI / 25;
     double autoSpeed = Math.PI / 300;
+    private float distance = 1.5f;
 
     public DemoPanel() {
-        setUpProjectionMatrix();
+        // setUpProjectionMatrix();
         setBackground(Color.black);
         makeCube();
         repaint();
         setPreferredSize(new Dimension(800, 800));
-        setUpRotations(keyboardSpeed);
+        setUpRotations(autoSpeed);
         Timer timer = new Timer(1000 / 60, e -> {
             step();
             repaint();
         });
-        // timer.start();
+        timer.start();
         setFocusable(true); // Ensure that the DemoPanel has keyboard focus
         addKeyListener(new KeyAdapter() {
             @Override
@@ -49,6 +51,14 @@ public class DemoPanel extends JPanel {
                 }
                 if (e.getKeyCode() == KeyEvent.VK_D) {
                     stepZ();
+                    repaint();
+                }
+                if (e.getKeyCode() == KeyEvent.VK_J) {
+                    distance -= 0.03f;
+                    repaint();
+                }
+                if (e.getKeyCode() == KeyEvent.VK_K) {
+                    distance += 0.03f;
                     repaint();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
@@ -126,10 +136,11 @@ public class DemoPanel extends JPanel {
         };
     }
 
-    public void setUpProjectionMatrix() {
+    public void setUpProjectionMatrix(float z) {
+        z = 1 / (distance - z);
         matProj = new float[][] {
-                { 1f, 0f, 0f },
-                { 0f, 1f, 0f },
+                { z, 0f, 0f },
+                { 0f, z, 0f },
                 { 0f, 0f, 0f }
         };
     }
@@ -152,6 +163,7 @@ public class DemoPanel extends JPanel {
         g.setStroke(new BasicStroke(15));
         float[][] projectedCube = new float[8][2];
         for (int i = 0; i < 8; i++) {
+            setUpProjectionMatrix(cube[i].z);
             float[] vec = multiplyMatrix(cube[i], matProj);
             vec[0] = vec[0] * scale + middleX;
             vec[1] = vec[1] * scale + middleY;

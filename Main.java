@@ -1,9 +1,12 @@
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 
 public class Main {
-    static JFrame frame = new JFrame("3D Renderer");
+    static JFrame frame = new JFrame(
+            "Enter to play/pause animation. J and K to Zoom and A, S, D to rotate cube when frozen.");
 
     public static void main(String[] args) {
         frame.setBackground(Color.black);
