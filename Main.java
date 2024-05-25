@@ -11,7 +11,7 @@ public class Main {
     public static void main(String[] args) {
         frame.setBackground(Color.black);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new DemoPanel());
+        frame.add(new MeshAttemptPanel());
         frame.pack();
         frame.setVisible(true);
 

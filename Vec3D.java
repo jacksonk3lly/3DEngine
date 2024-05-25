@@ -25,4 +25,12 @@ public class Vec3D {
             return z;
         return 0;
     }
+
+    public float[] toArray() {
+        return new float[] { x, y, z };
+    }
+
+    public float getLength() {
+        return (float) Math.sqrt(x * x + y * y + z * z);
+    }
 }
