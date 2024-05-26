@@ -8,7 +8,7 @@ import javax.swing.JPanel;
 import java.awt.event.KeyEvent; // Add the missing import statement
 
 public class MeshAttemptPanel extends JPanel {
-
+    Vec3D camera = new Vec3D(0, 0, 0);
     Mesh cube;
 
     public MeshAttemptPanel() {
@@ -21,8 +21,16 @@ public class MeshAttemptPanel extends JPanel {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_A) {
+                if (e.getKeyCode() == KeyEvent.VK_X) {
+                    cube.rotateX(Math.PI / 25);
+                    repaint();
+                }
+                if (e.getKeyCode() == KeyEvent.VK_Y) {
                     cube.rotateY(Math.PI / 25);
+                    repaint();
+                }
+                if (e.getKeyCode() == KeyEvent.VK_Z) {
+                    cube.rotateZ(Math.PI / 25);
                     repaint();
                 }
             }
@@ -32,26 +40,39 @@ public class MeshAttemptPanel extends JPanel {
     void setUpMeshCube() {
         cube = new Mesh(
                 new float[][][] {
-                        { { -1, -1, -1 }, { 1, -1, -1 }, { 1, 1, -1 } },
-                        { { 1, 1, -1 }, { -1, 1, -1 }, { -1, -1, -1 } },
-                        { { -1, -1, 1 }, { 1, -1, 1 }, { 1, 1, 1 } },
-                        { { 1, 1, 1 }, { -1, 1, 1 }, { -1, -1, 1 } },
-                        { { -1, -1, -1 }, { -1, 1, -1 }, { -1, 1, 1 } },
-                        { { -1, 1, 1 }, { -1, -1, 1 }, { -1, -1, -1 } },
+
+                        // south
+                        { { -1, -1, -1 }, { -1, 1, -1 }, { 1, 1, -1 } },
+                        { { -1, -1, -1 }, { 1, 1, -1 }, { 1, -1, -1 } },
+
+                        // west
                         { { 1, -1, -1 }, { 1, 1, -1 }, { 1, 1, 1 } },
-                        { { 1, 1, 1 }, { 1, -1, 1 }, { 1, -1, -1 } },
-                        { { -1, -1, -1 }, { 1, -1, -1 }, { 1, -1, 1 } },
-                        { { 1, -1, 1 }, { -1, -1, 1 }, { -1, -1, -1 } },
-                        { { -1, 1, -1 }, { 1, 1, -1 }, { 1, 1, 1 } },
-                        { { 1, 1, 1 }, { -1, 1, 1 }, { -1, 1, -1 } }
-                });
+                        { { 1, -1, -1 }, { 1, 1, 1 }, { 1, -1, 1 } },
+
+                        // east
+                        { { -1, -1, 1 }, { -1, 1, 1 }, { -1, 1, -1 } },
+                        { { -1, -1, 1 }, { -1, 1, -1 }, { -1, -1, -1 } },
+
+                        // top
+                        { { -1, 1, -1 }, { -1, 1, 1 }, { 1, 1, 1 } },
+                        { { -1, 1, -1 }, { 1, 1, 1 }, { 1, 1, -1 } },
+
+                        // bottom
+                        { { -1, -1, 1 }, { -1, -1, -1 }, { 1, -1, -1 } },
+                        { { -1, -1, 1 }, { 1, -1, -1 }, { 1, -1, 1 } },
+
+                        // north
+                        { { 1, -1, 1 }, { 1, 1, 1 }, { -1, 1, 1 } },
+                        { { 1, -1, 1 }, { -1, 1, 1 }, { -1, -1, 1 } }
+                // distance from camera
+                }, new Vec3D(0, 0, 2.5f));
 
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        cube.draw(100, getWidth() / 2, getWidth() / 2, 2, g);
+        cube.draw(100, getWidth() / 2, getWidth() / 2, camera, g);
     }
 
 }

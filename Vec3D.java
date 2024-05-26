@@ -10,6 +10,15 @@ public class Vec3D {
         this.z = z;
     }
 
+    public void normalize() {
+        float length = getLength();
+        if (length != 0) {
+            x /= length;
+            y /= length;
+            z /= length;
+        }
+    }
+
     public Vec3D(float[] vec) {
         this.x = vec[0];
         this.y = vec[1];

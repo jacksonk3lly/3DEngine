@@ -1,3 +1,5 @@
+import java.awt.Color;
+
 public class Utilities {
 
     /**
@@ -7,13 +9,64 @@ public class Utilities {
      * @param distance the distance
      * @return the projection matrix
      */
-    public static float[][] setUpProjectionMatrix(float z, float distance) {
-        z = 1 / (distance - z);
+    public static float[][] setUpProjectionMatrix(float z) {
         return new float[][] {
-                { z, 0f, 0f },
-                { 0f, z, 0f },
+                { 1 / z, 0f, 0f },
+                { 0f, 1 / z, 0f },
                 { 0f, 0f, 0f }
         };
+    }
+
+    /**
+     * method which takes a brightness variable from 0 to 1 returns a new Color
+     * 
+     * @param color
+     * @param brightness
+     */
+    public static Color adjustColor(Color color, float brightness) {
+        int red = (int) (color.getRed() * brightness * brightness);
+        int green = (int) (color.getGreen() * brightness * brightness);
+        int blue = (int) (color.getBlue() * brightness * brightness);
+        return new Color(red, green, blue);
+    }
+
+    /**
+     * Adds two vectors.
+     * 
+     * @param a firstVec
+     * @param b secondVec
+     * @return
+     */
+    public static Vec3D vecAdd(Vec3D a, Vec3D b) {
+        return new Vec3D(a.x + b.x, a.y + b.y, a.z + b.z);
+    }
+
+    /**
+     * Translates a triangle by a given vector.
+     * 
+     * @param t
+     * @param translation
+     * @return
+     */
+    public static Triangle getTranslatedTriangle(Triangle t, Vec3D translation) {
+        return new Triangle(
+                vecAdd(t.vertices[0], translation),
+                vecAdd(t.vertices[1], translation),
+                vecAdd(t.vertices[2], translation));
+    }
+
+    /**
+     * dot product
+     * 
+     * @param vec3d first vector
+     * @param b     second vector
+     */
+    public static float dotProduct(Vec3D vec3d, Vec3D b) {
+        return vec3d.x * b.x + vec3d.y * b.y + vec3d.z * b.z;
+    }
+
+    public static Vec3D vecSub(Vec3D a, Vec3D b) {
+        return new Vec3D(a.x - b.x, a.y - b.y, a.z - b.z);
     }
 
     /**
