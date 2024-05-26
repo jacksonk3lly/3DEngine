@@ -9,11 +9,12 @@ public class Utilities {
      * @param distance the distance
      * @return the projection matrix
      */
-    public static float[][] setUpProjectionMatrix(float z) {
+    public static float[][] setUpProjectionMatrix(float z, float fov) {
+        float f = 1 / z * (float) Math.tan((double) fov / 2);
         return new float[][] {
-                { 1 / z, 0f, 0f },
-                { 0f, 1 / z, 0f },
-                { 0f, 0f, 0f }
+                { f, 0f, 0f },
+                { 0f, f, 0f },
+                { 0f, 0f, 1f }
         };
     }
 

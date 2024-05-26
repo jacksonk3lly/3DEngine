@@ -71,13 +71,13 @@ public class Triangle {
      * 
      * @param g the graphics object to draw the triangle
      */
-    public void draw(int scale, float xoffset, float yoffset, Color color, Graphics g) {
+    public void draw(int scale, float xoffset, float yoffset, Color color, float fov, Graphics g) {
         Vec3D[] projectedVerticies = new Vec3D[3];
         Vec3D light = new Vec3D(0, 0, -1);
         light.normalize();
         for (int i = 0; i < 3; i++) {
             float[] vec = Utilities.multiplyMatrix(vertices[i],
-                    Utilities.setUpProjectionMatrix(vertices[i].z));
+                    Utilities.setUpProjectionMatrix(vertices[i].z, fov));
             vec[0] = vec[0] * scale + xoffset;
             vec[1] = vec[1] * scale + yoffset;
             projectedVerticies[i] = new Vec3D(vec[0], vec[1], 0);
