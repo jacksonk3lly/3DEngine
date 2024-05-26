@@ -69,31 +69,30 @@ public class Mesh {
      * @param yoffset the y-axis offset for the mesh
      * @param g       the Graphics object used for drawing
      */
-    void draw(int scale, float xoffset, float yoffset, Vec3D camera, float fov, Graphics g) {
+    void draw(int scale, float xoffset, float yoffset, float yaw, Vec3D camera, float fov, Graphics g) {
         ArrayList<Triangle> trianglesToDraw = new ArrayList<Triangle>();
         for (Triangle t : triangles) {
-            Vec3D[] verticies = t.getVertices();
-            // System.out.println(
-            // Arrays.toString(Utilities.vecSub(Utilities.vecAdd(verticies[0], new Vec3D(0,
-            // 0, distance)), camera)
-            // .toArray()));
-            // System.out.println(Utilities.dotProduct(t.getNormal(),
-            // Utilities.vecSub(Utilities.vecAdd(verticies[0], new Vec3D(0, 0, distance)),
-            // camera)));
-            Triangle translatedTriangle = Utilities.getTranslatedTriangle(t, t.getLocation());
-            Vec3D cameraRay = Utilities.vecSub(translatedTriangle.vertices[0], camera);
+            // translate position before drawing
+            Vec3D translatedLocation = Utilities.vecSub(t.getLocation(), camera);
+            Triangle translatedTriangle = Utilities.getTranslatedTriangle(t, translatedLocation);
+            if (yaw != 0) {
+                translatedTriangle.rotateY(yaw);
+            }
+            // origin because everything moves around the camera while the camera actually
+            // stays in place
+            Vec3D cameraRay = Utilities.vecSub(translatedTriangle.vertices[0], new Vec3D(0, 0, 0));
+            // dont draw the triangle if it is facing away from the camera
             if (Utilities.dotProduct(translatedTriangle.getNormal(), cameraRay) < 0f) {
                 trianglesToDraw.add(translatedTriangle);
             }
         }
-
+        // sort so that we draw the triangles that are closer to the camera last
         trianglesToDraw.sort(new Comparator<Triangle>() {
             @Override
             public int compare(Triangle t1, Triangle t2) {
                 // Get the z position of a random vertex from each triangle
                 float z1 = t1.getVertices()[0].z;
                 float z2 = t2.getVertices()[0].z;
-
                 // Compare the z positions
                 if (z1 > z2) {
                     return -1;
@@ -104,7 +103,7 @@ public class Mesh {
                 }
             }
         });
-
+        // Draw the triangles
         for (Triangle t : trianglesToDraw) {
             t.draw(scale, xoffset, yoffset, Color.green, fov, g);
         }

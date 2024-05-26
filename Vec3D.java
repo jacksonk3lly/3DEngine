@@ -19,6 +19,17 @@ public class Vec3D {
         }
     }
 
+    /**
+     * multiplies the vector by a scalar
+     * 
+     * @param scalar
+     */
+    public void multiply(float scalar) {
+        x *= scalar;
+        y *= scalar;
+        z *= scalar;
+    }
+
     public Vec3D(float[] vec) {
         this.x = vec[0];
         this.y = vec[1];

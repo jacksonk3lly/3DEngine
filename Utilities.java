@@ -56,6 +56,13 @@ public class Utilities {
                 vecAdd(t.vertices[2], translation));
     }
 
+    public static Triangle triangleSubVector(Triangle t, Vec3D translation) {
+        return new Triangle(
+                vecSub(t.vertices[0], translation),
+                vecSub(t.vertices[1], translation),
+                vecSub(t.vertices[2], translation));
+    }
+
     /**
      * dot product
      * 
@@ -124,7 +131,7 @@ public class Utilities {
      * @param matrix the matrix
      * @return the result of the multiplication
      */
-    public static float[] multiplyMatrix(Vec3D vec, float[][] matrix) {
+    public static Vec3D multiplyMatrix(Vec3D vec, float[][] matrix) {
         float[] result = new float[matrix.length];
         for (int i = 0; i < result.length; i++) {
             result[i] = 0;
@@ -132,6 +139,6 @@ public class Utilities {
                 result[i] += vec.get(j) * matrix[i][j];
             }
         }
-        return result;
+        return new Vec3D(result);
     }
 }

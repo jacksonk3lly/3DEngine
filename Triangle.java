@@ -27,6 +27,15 @@ public class Triangle {
         return location;
     }
 
+    /**
+     * mutator method for the location of the triangle
+     * 
+     * @param location
+     */
+    public void setLocation(Vec3D location) {
+        this.location = location;
+    }
+
     public Triangle(Vec3D v1, Vec3D v2, Vec3D v3, Vec3D location) {
         vertices = new Vec3D[] { v1, v2, v3 };
         this.location = location;
@@ -76,11 +85,11 @@ public class Triangle {
         Vec3D light = new Vec3D(0, 0, -1);
         light.normalize();
         for (int i = 0; i < 3; i++) {
-            float[] vec = Utilities.multiplyMatrix(vertices[i],
+            Vec3D vec = Utilities.multiplyMatrix(vertices[i],
                     Utilities.setUpProjectionMatrix(vertices[i].z, fov));
-            vec[0] = -vec[0] * scale + xoffset;
-            vec[1] = -vec[1] * scale + yoffset;
-            projectedVerticies[i] = new Vec3D(vec[0], vec[1], 0);
+            vec.x = vec.x * scale + xoffset;
+            vec.y = -vec.y * scale + yoffset;
+            projectedVerticies[i] = vec;
         }
         for (Vec3D vec : projectedVerticies) {
             g.setColor(color);
@@ -130,7 +139,7 @@ public class Triangle {
      */
     public void rotateX(double theta) {
         for (int i = 0; i < 3; i++) {
-            vertices[i] = new Vec3D(Utilities.multiplyMatrix(vertices[i], Utilities.matRotX(theta)));
+            vertices[i] = Utilities.multiplyMatrix(vertices[i], Utilities.matRotX(theta));
         }
     }
 
@@ -141,7 +150,7 @@ public class Triangle {
      */
     public void rotateY(double theta) {
         for (int i = 0; i < 3; i++) {
-            vertices[i] = new Vec3D(Utilities.multiplyMatrix(vertices[i], Utilities.matRotY(theta)));
+            vertices[i] = Utilities.multiplyMatrix(vertices[i], Utilities.matRotY(theta));
         }
     }
 
@@ -152,7 +161,7 @@ public class Triangle {
      */
     public void rotateZ(double theta) {
         for (int i = 0; i < 3; i++) {
-            vertices[i] = new Vec3D(Utilities.multiplyMatrix(vertices[i], Utilities.matRotZ(theta)));
+            vertices[i] = Utilities.multiplyMatrix(vertices[i], Utilities.matRotZ(theta));
         }
     }
 
