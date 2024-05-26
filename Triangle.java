@@ -78,8 +78,8 @@ public class Triangle {
         for (int i = 0; i < 3; i++) {
             float[] vec = Utilities.multiplyMatrix(vertices[i],
                     Utilities.setUpProjectionMatrix(vertices[i].z, fov));
-            vec[0] = vec[0] * scale + xoffset;
-            vec[1] = vec[1] * scale + yoffset;
+            vec[0] = -vec[0] * scale + xoffset;
+            vec[1] = -vec[1] * scale + yoffset;
             projectedVerticies[i] = new Vec3D(vec[0], vec[1], 0);
         }
         for (Vec3D vec : projectedVerticies) {

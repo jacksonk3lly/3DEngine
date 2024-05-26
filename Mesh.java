@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class Mesh {
@@ -69,6 +70,7 @@ public class Mesh {
      * @param g       the Graphics object used for drawing
      */
     void draw(int scale, float xoffset, float yoffset, Vec3D camera, float fov, Graphics g) {
+        ArrayList<Triangle> trianglesToDraw = new ArrayList<Triangle>();
         for (Triangle t : triangles) {
             Vec3D[] verticies = t.getVertices();
             // System.out.println(
@@ -81,8 +83,30 @@ public class Mesh {
             Triangle translatedTriangle = Utilities.getTranslatedTriangle(t, t.getLocation());
             Vec3D cameraRay = Utilities.vecSub(translatedTriangle.vertices[0], camera);
             if (Utilities.dotProduct(translatedTriangle.getNormal(), cameraRay) < 0f) {
-                translatedTriangle.draw(scale, xoffset, yoffset, Color.green, fov, g);
+                trianglesToDraw.add(translatedTriangle);
             }
+        }
+
+        trianglesToDraw.sort(new Comparator<Triangle>() {
+            @Override
+            public int compare(Triangle t1, Triangle t2) {
+                // Get the z position of a random vertex from each triangle
+                float z1 = t1.getVertices()[0].z;
+                float z2 = t2.getVertices()[0].z;
+
+                // Compare the z positions
+                if (z1 > z2) {
+                    return -1;
+                } else if (z1 < z2) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        });
+
+        for (Triangle t : trianglesToDraw) {
+            t.draw(scale, xoffset, yoffset, Color.green, fov, g);
         }
     }
 
