@@ -69,6 +69,8 @@ public class MeshVeiwerPanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        g.setColor(Color.black);
+        g.fillRect(0, 0, getWidth(), getHeight());
         for (Mesh mesh : meshes) {
             mesh.draw(100, getWidth() / 2, getWidth() / 2, camera, fov, g);
         }
