@@ -1,20 +1,29 @@
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.io.FileNotFoundException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.event.MouseEvent;
+//import mouse adapter
+import java.awt.event.MouseAdapter;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import java.awt.event.KeyEvent; // Add the missing import statement
+import org.w3c.dom.events.MouseEvent;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseListener;
 
 public class MeshVeiwerPanel extends JPanel {
     Vec3D camera = new Vec3D(0, 0, 0);
     float yaw = 0;
+    float pitch = 0;
+    JPanel panel = this;
     ArrayList<Mesh> meshes = new ArrayList<Mesh>();
     public float fov = (float) Math.PI * .8f;
 
@@ -29,13 +38,13 @@ public class MeshVeiwerPanel extends JPanel {
             System.out.println("File not found");
         }
         setUpKeyBindings();
+        requestFocusInWindow();
     }
 
-    /**
-     * Sets up key bindings for the panel using the KeyboardStatus class.
-     */
     public void setUpKeyBindings() {
         setFocusable(true); // Ensure that the DemoPanel has keyboard focus
+        // addMouseListener(new MouseLookController(this));
+        // addMouseMotionListener(new MouseLookController());
         KeyboardStatus keyboard = new KeyboardStatus();
         addKeyListener(keyboard);
         Timer keyCheckTimer = new Timer(20, e -> {
@@ -66,7 +75,6 @@ public class MeshVeiwerPanel extends JPanel {
                 forward.multiply(.2f);
                 camera = Utilities.vecSub(camera, forward);
                 // camera = new Vec3D(camera.x, camera.y, camera.z - 0.1f);
-                // System.out.println(camera.z);
                 repaint();
             }
             if (keyboard.isKeyPressed(KeyEvent.VK_A)) {
@@ -81,20 +89,43 @@ public class MeshVeiwerPanel extends JPanel {
                 camera = Utilities.vecAdd(camera, right);
                 repaint();
             }
-            if (keyboard.isKeyPressed(KeyEvent.VK_Q)) {
+            if (keyboard.isKeyPressed(KeyEvent.VK_SHIFT)) {
+                camera = new Vec3D(camera.x, camera.y - 0.1f, camera.z);
+                repaint();
+            }
+            if (keyboard.isKeyPressed(KeyEvent.VK_SPACE)) {
                 camera = new Vec3D(camera.x, camera.y + 0.1f, camera.z);
                 repaint();
             }
             if (keyboard.isKeyPressed(KeyEvent.VK_RIGHT)) {
-                yaw -= Math.PI / 90;
+                yaw -= Math.PI / 50;
                 Vec3D forward = new Vec3D((float) Math.sin(yaw), 0, (float) Math.cos(yaw));
-                System.out.println(forward.x);
                 repaint();
             }
             if (keyboard.isKeyPressed(KeyEvent.VK_LEFT)) {
-                yaw += Math.PI / 90;
+                yaw += Math.PI / 50;
                 repaint();
             }
+            if (keyboard.isKeyPressed(KeyEvent.VK_UP)) {
+                pitch += Math.PI / 50;
+                repaint();
+            }
+            if (keyboard.isKeyPressed(KeyEvent.VK_DOWN)) {
+                pitch -= Math.PI / 50;
+                repaint();
+            }
+
+            // Point mouseLocation = MouseInfo.getPointerInfo().getLocation();
+            // int mouseX = (int) mouseLocation.getX();
+            // int mouseY = (int) mouseLocation.getY();
+            // int centerX = getWidth() / 2;
+            // int centerY = getHeight() / 2;
+            // float sensitivity = 0.00005f;
+
+            // yaw += -(mouseX - centerX) * sensitivity;
+            // pitch += -(mouseY - centerY) * sensitivity;
+
+            // repaint();
         });
         keyCheckTimer.start();
     }
@@ -128,8 +159,31 @@ public class MeshVeiwerPanel extends JPanel {
         g.setColor(Color.black);
         g.fillRect(0, 0, getWidth(), getHeight());
         for (Mesh mesh : meshes) {
-            mesh.draw(100, getWidth() / 2, getWidth() / 2, yaw, camera, fov, g);
+            mesh.draw(100, getWidth() / 2, getWidth() / 2, yaw, pitch, camera, fov, g);
         }
     }
 
+    public class MouseLookController extends MouseAdapter {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            System.out.println("clicked");
+            panel.requestFocus();
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            int mouseX = e.getX();
+            int mouseY = e.getY();
+            int centerX = getWidth() / 2;
+            int centerY = getHeight() / 2;
+            float sensitivity = 0.0001f;
+
+            yaw += -(mouseX - centerX) * sensitivity;
+            pitch += -(mouseY - centerY) * sensitivity;
+
+            repaint();
+            // Keep yaw and pitch within certain bounds
+        }
+    }
 }

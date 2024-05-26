@@ -13,9 +13,10 @@ public class MeshLoadingPanel extends JPanel {
     public MeshLoadingPanel() {
         setLayout(new BorderLayout());
         meshVeiwerPanel = new MeshVeiwerPanel();
-        add(meshVeiwerPanel, BorderLayout.CENTER);
         setUpControlPanel();
+        add(meshVeiwerPanel, BorderLayout.CENTER);
         meshVeiwerPanel.requestFocus();
+        requestFocusInWindow();
     }
 
     private void setUpControlPanel() {

@@ -69,7 +69,7 @@ public class Mesh {
      * @param yoffset the y-axis offset for the mesh
      * @param g       the Graphics object used for drawing
      */
-    void draw(int scale, float xoffset, float yoffset, float yaw, Vec3D camera, float fov, Graphics g) {
+    void draw(int scale, float xoffset, float yoffset, float yaw, float pitch, Vec3D camera, float fov, Graphics g) {
         ArrayList<Triangle> trianglesToDraw = new ArrayList<Triangle>();
         for (Triangle t : triangles) {
             // translate position before drawing
@@ -77,6 +77,9 @@ public class Mesh {
             Triangle translatedTriangle = Utilities.getTranslatedTriangle(t, translatedLocation);
             if (yaw != 0) {
                 translatedTriangle.rotateY(yaw);
+            }
+            if (pitch != 0) {
+                translatedTriangle.rotateX(pitch);
             }
             // origin because everything moves around the camera while the camera actually
             // stays in place
