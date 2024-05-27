@@ -14,8 +14,6 @@ import java.awt.event.MouseAdapter;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-import org.w3c.dom.events.MouseEvent;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
 
@@ -32,8 +30,19 @@ public class MeshVeiwerPanel extends JPanel {
         setBackground(Color.black); // Set the background color to black
 
         try {
-            Mesh mainMesh = new Mesh("teapot.obj", new Vec3D(0, 0, 5f));
+            Mesh duck = new Mesh("duck.obj", new Vec3D(0, -0.5f, 6f));
+            Mesh mountains = new Mesh("mountains.obj", new Vec3D(0, -10, +15));
+            mountains.rotateY(Math.PI + Math.PI / 3);
+            duck.rotateY(Math.PI / 2);
+            Mesh mainMesh = duck;
+
             meshes.add(mainMesh);
+            meshes.add(mountains);
+            meshes.add(new Mesh("teapot.obj", new Vec3D(+6, 1, 5f)));
+            Mesh man = new Mesh("man.obj", new Vec3D(0, -1, 15));
+            man.rotateY(Math.PI);
+            meshes.add(man);
+            camera = new Vec3D(0, 3, 0);
         } catch (FileNotFoundException e) {
             System.out.println("File not found");
         }
@@ -107,11 +116,15 @@ public class MeshVeiwerPanel extends JPanel {
                 repaint();
             }
             if (keyboard.isKeyPressed(KeyEvent.VK_UP)) {
-                pitch += Math.PI / 50;
+                if (pitch < Math.PI / 2) {
+                    pitch += Math.PI / 50;
+                }
                 repaint();
             }
             if (keyboard.isKeyPressed(KeyEvent.VK_DOWN)) {
-                pitch -= Math.PI / 50;
+                if (pitch > -Math.PI / 2) {
+                    pitch -= Math.PI / 50;
+                }
                 repaint();
             }
 
@@ -153,16 +166,6 @@ public class MeshVeiwerPanel extends JPanel {
         repaint();
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        g.setColor(Color.black);
-        g.fillRect(0, 0, getWidth(), getHeight());
-        for (Mesh mesh : meshes) {
-            mesh.draw(100, getWidth() / 2, getWidth() / 2, yaw, pitch, camera, fov, g);
-        }
-    }
-
     public class MouseLookController extends MouseAdapter {
 
         @Override
@@ -183,7 +186,14 @@ public class MeshVeiwerPanel extends JPanel {
             pitch += -(mouseY - centerY) * sensitivity;
 
             repaint();
-            // Keep yaw and pitch within certain bounds
         }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.setColor(Color.black);
+        g.fillRect(0, 0, getWidth(), getHeight());
+        Utilities.drawMeshes(meshes, 100, getWidth() / 2, getWidth() / 2, yaw, pitch, camera, fov, g);
     }
 }

@@ -100,13 +100,28 @@ public class Triangle {
             // vec.y);
             // circleDiameter, circleDiameter);
         }
-        // for (int i = 0; i < 3; i++) {
-        // connect(projectedVerticies[i], projectedVerticies[(i + 1) % 3], g);
-        // }
+        for (int i = 0; i < 3; i++) {
+            connect(projectedVerticies[i], projectedVerticies[(i + 1) % 3], g);
+        }
 
         Graphics2D g2d = (Graphics2D) g;
         float brightness = Utilities.dotProduct(getNormal(), light);
         color = Utilities.adjustColor(color, brightness);
+
+        // Clip the projected vertices to ensure they are within the screen bounds
+        for (int i = 0; i < 3; i++) {
+            if (projectedVerticies[i].x < 0) {
+                projectedVerticies[i].x = 0;
+            } else if (projectedVerticies[i].x > g2d.getClipBounds().getWidth()) {
+                projectedVerticies[i].x = (float) g2d.getClipBounds().getWidth();
+            }
+
+            if (projectedVerticies[i].y < 0) {
+                projectedVerticies[i].y = 0;
+            } else if (projectedVerticies[i].y > g2d.getClipBounds().getHeight()) {
+                projectedVerticies[i].y = (float) g2d.getClipBounds().getHeight();
+            }
+        }
 
         g2d.setColor(color);
         // Fill the triangle with the specified color
@@ -127,7 +142,7 @@ public class Triangle {
      */
     public void connect(Vec3D p1, Vec3D p2, Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setStroke(new BasicStroke(2));
+        g2d.setStroke(new BasicStroke(1));
         g2d.setColor(Color.black);
         g2d.drawLine((int) p1.x, (int) p1.y, (int) p2.x, (int) p2.y);
     }
