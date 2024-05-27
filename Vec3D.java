@@ -53,4 +53,13 @@ public class Vec3D {
     public float getLength() {
         return (float) Math.sqrt(x * x + y * y + z * z);
     }
+
+    /**
+     * toString method returns x, y, z string
+     * 
+     * @return x, y, z string
+     */
+    public String toString() {
+        return "x:" + x + ", y:" + y + ", z:" + z;
+    }
 }

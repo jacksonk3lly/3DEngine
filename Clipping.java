@@ -31,11 +31,11 @@ public class Clipping {
         return intersection;
     }
 
-    public static List<double[]> clipPolygon(List<double[]> vertices, String edge, double boundary) {
-        List<double[]> clippedVertices = new ArrayList<>();
-        double[] prevVertex = vertices.get(vertices.size() - 1);
+    public static List<float[]> clipPolygon(List<float[]> vertices, String edge, float boundary) {
+        List<float[]> clippedVertices = new ArrayList<>();
+        float[] prevVertex = vertices.get(vertices.size() - 1);
 
-        for (double[] currVertex : vertices) {
+        for (float[] currVertex : vertices) {
             if (inside(currVertex[0], currVertex[1], edge, boundary)) {
                 if (!inside(prevVertex[0], prevVertex[1], edge, boundary)) {
                     clippedVertices.add(computeIntersection(prevVertex[0], prevVertex[1], currVertex[0], currVertex[1],

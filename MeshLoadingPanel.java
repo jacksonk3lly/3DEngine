@@ -17,6 +17,8 @@ public class MeshLoadingPanel extends JPanel {
         add(meshVeiwerPanel, BorderLayout.CENTER);
         meshVeiwerPanel.requestFocus();
         requestFocusInWindow();
+        Main.frame.getRootPane().requestFocusInWindow(); // Focus on the root pane or another component
+
     }
 
     private void setUpControlPanel() {
@@ -61,6 +63,9 @@ public class MeshLoadingPanel extends JPanel {
         controlPanel.add(fieldOfViewSlider);
         controlPanel.add(applyButton);
         add(controlPanel, BorderLayout.NORTH);
+        fieldOfViewSlider.requestFocusInWindow();
+        applyButton.requestFocusInWindow();
+        fileName.setFocusTraversalKeysEnabled(false);
 
     }
 

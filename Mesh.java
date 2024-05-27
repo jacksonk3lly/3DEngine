@@ -48,6 +48,16 @@ public class Mesh {
     }
 
     /**
+     * returns the triangles of the mesh
+     * 
+     * @param vertices
+     * @param location
+     */
+    public ArrayList<Triangle> getTriangles() {
+        return triangles;
+    }
+
+    /**
      * Creates a mesh from a 3D array of vertices.
      * 
      * @param vertices corners of the triangles
@@ -108,7 +118,13 @@ public class Mesh {
         });
         // Draw the triangles
         for (Triangle t : trianglesToDraw) {
-            t.draw(scale, xoffset, yoffset, Color.green, fov, g);
+            Triangle[] clippedTriangles = Utilities.clipTriangeletoPlane(new Vec3D(0, 0, .01f), new Vec3D(0, 0, 1), t);
+            if (clippedTriangles == null) {
+                continue;
+            }
+            for (Triangle clippedTriangle : clippedTriangles) {
+                clippedTriangle.draw(scale, xoffset, yoffset, Color.pink, fov, g);
+            }
         }
     }
 
