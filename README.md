@@ -6,4 +6,8 @@ javac -cp . Main.java
 
 java Main
 
-Then after adjusting the field of view or hitting reload mesh you can translate the camera around with wasd and adjust the pitch and yaw with the arrow keys. Additionally you can move the last imported mesh with the xyz keys.
+Then after adjusting the field of view or hitting reload mesh you can translate the camera around with wasd.
+Up and down with shift and space.
+Adjust the pitch and yaw with the arrow keys.
+
+Additionally you can move the last imported mesh with the xyz keys.
