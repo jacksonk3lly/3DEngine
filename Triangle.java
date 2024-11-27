@@ -8,6 +8,7 @@ public class Triangle {
 
     Vec3D[] vertices;
     private Vec3D location;
+    boolean selected;
 
     /**
      * Returns an array of vertices that make up the triangle.
@@ -16,6 +17,16 @@ public class Triangle {
      */
     public Vec3D[] getVertices() {
         return vertices;
+    }
+
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     /**
@@ -36,16 +47,22 @@ public class Triangle {
         this.location = location;
     }
 
-    public Triangle(Vec3D v1, Vec3D v2, Vec3D v3, Vec3D location) {
-        vertices = new Vec3D[] { v1, v2, v3 };
+    public Triangle(Vec3D v1, Vec3D v2, Vec3D v3, Vec3D location, boolean selected) {
+        this.selected = selected;
+        // vertices = new Vec3D[] { Utilities.vecAdd(v1, location), Utilities.vecAdd(location,v2),Utilities.vecAdd(v3,location)};
+        vertices = new Vec3D[] {v1,v2,v3};
+
         this.location = location;
     }
 
-    public Triangle(Vec3D v1, Vec3D v2, Vec3D v3) {
+    public Triangle(Vec3D v1, Vec3D v2, Vec3D v3, boolean selected) {
         vertices = new Vec3D[] { v1, v2, v3 };
+        this.selected = selected;
+        this.location = new Vec3D(0, 0, 0);
     }
 
-    public Triangle(int[][] verticies) {
+    public Triangle(int[][] verticies, boolean selected) {
+        this.selected = selected;
         vertices = new Vec3D[3];
         for (int i = 0; i < 3; i++) {
             this.vertices[i] = new Vec3D(verticies[i][0], verticies[i][1], verticies[i][2]);
@@ -100,20 +117,25 @@ public class Triangle {
             // vec.y);
             // circleDiameter, circleDiameter);
         }
-        for (int i = 0; i < 3; i++) {
-            connect(projectedVerticies[i], projectedVerticies[(i + 1) % 3], g);
+        for (int i = 0; i < 3; i++) { 
+            // connect(projectedVerticies[i], projectedVerticies[(i + 1) % 3], g);
         }
 
         Graphics2D g2d = (Graphics2D) g;
         float brightness = Utilities.dotProduct(getNormal(), light);
+        brightness = Math.abs(brightness);
+        float minimumBrightness = .4f;
+        if(brightness<minimumBrightness){
+            brightness = minimumBrightness;
+
+        }
         color = Utilities.adjustColor(color, brightness);
 
         // Clip the projected vertices to ensure they are within the screen bounds
         for (int i = 0; i < 3; i++) {
             if (projectedVerticies[i].x < 0) {
                 projectedVerticies[i].x = 0;
-            } else if (projectedVerticies[i].x > g2d.getClipBounds().getWidth()) {
-                projectedVerticies[i].x = (float) g2d.getClipBounds().getWidth();
+            } else if (projectedVerticies[i].x > g2d.getClipBounds().getWidth()) { projectedVerticies[i].x = (float) g2d.getClipBounds().getWidth();
             }
 
             if (projectedVerticies[i].y < 0) {
@@ -124,6 +146,9 @@ public class Triangle {
         }
 
         g2d.setColor(color);
+        if(this.selected) {
+            g2d.setColor(Color.red);
+        }
         // Fill the triangle with the specified color
         g2d.fillPolygon(
                 new int[] { (int) projectedVerticies[0].x, (int) projectedVerticies[1].x,
@@ -180,4 +205,47 @@ public class Triangle {
         }
     }
 
+
+    public boolean containsPoint2D(int scale, float xoffset, float yoffset, float fov, int x, int y) {
+        Vec3D[] projectedVerticies = new Vec3D[3];
+        Vec3D light = new Vec3D(0, 0, -1);
+        light.normalize();
+        for (int i = 0; i < 3; i++) {
+            Vec3D vec = Utilities.multiplyMatrix(vertices[i],
+                    Utilities.setUpProjectionMatrix(vertices[i].z, fov));
+            vec.x = vec.x * scale + xoffset;
+            vec.y = -vec.y * scale + yoffset;
+            projectedVerticies[i] = vec;
+        }
+        int xOffcount = 0;
+        int yOffcount = 0;
+        for(Vec3D vec : projectedVerticies) {
+            if(vec.x < 0|| vec.x > Main.getWindowWidth()) {
+                xOffcount++;
+            }
+            if(vec.y < 0 || vec.y > Main.getWindowHeight()) {
+                yOffcount++;
+            }
+        }
+        if (xOffcount == 3 || yOffcount == 3) {
+            return false;
+        }
+
+        return isInsideTriangle(projectedVerticies[0].x, projectedVerticies[0].y, projectedVerticies[1].x,
+                projectedVerticies[1].y, projectedVerticies[2].x, projectedVerticies[2].y, x, y);
+    }
+
+    public static double triangleArea(double x1, double y1, double x2, double y2, double x3, double y3) {
+        return Math.abs((x1*(y2 - y3) + x2*(y3 - y1) + x3*(y1 - y2)) / 2.0);
+    }
+
+    public static boolean isInsideTriangle(double x1, double y1, double x2, double y2, double x3, double y3, double x, double y) {
+        double areaOriginal = triangleArea(x1, y1, x2, y2, x3, y3);
+
+        double area1 = triangleArea(x, y, x2, y2, x3, y3);
+        double area2 = triangleArea(x1, y1, x, y, x3, y3);
+        double area3 = triangleArea(x1, y1, x2, y2, x, y);
+
+        return (areaOriginal == area1 + area2 + area3);
+    }
 }

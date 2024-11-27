@@ -60,8 +60,8 @@ public class Utilities {
             @Override
             public int compare(Triangle t1, Triangle t2) {
                 // Get the z position of a random vertex from each triangle
-                float z1 = t1.getVertices()[0].z;
-                float z2 = t2.getVertices()[0].z;
+                float z1 = (t1.getVertices()[0].z+t1.getVertices()[1].z+t1.getVertices()[2].z)/3;
+                float z2 = (t2.getVertices()[0].z+t2.getVertices()[1].z+t2.getVertices()[2].z)/3;
                 // Compare the z positions
                 if (z1 > z2) {
                     return -1;
@@ -82,6 +82,63 @@ public class Utilities {
                 clippedTriangle.draw(scale, xoffset, yoffset, Color.pink, fov, g);
             }
         }
+    }
+
+
+    public static Triangle selectTriangle(ArrayList<Mesh> meshses, int scale, float xoffset, float yoffset, float yaw,
+            float pitch, Vec3D camera, float fov, int mouseX, int mouseY) {
+        ArrayList<Triangle[]> trianglesToDraw = new ArrayList<Triangle[]>();
+
+        for (Mesh mesh : meshses) {
+            ArrayList<Triangle> triangles = mesh.getTriangles();
+            for (Triangle t : triangles) {
+                // translate position before drawing
+                Vec3D translatedLocation = Utilities.vecSub(t.getLocation(), camera);
+                Triangle translatedTriangle = Utilities.getTranslatedTriangle(t, translatedLocation);
+               
+               
+                if (yaw != 0) {
+                    translatedTriangle.rotateY(yaw);
+                }
+                if (pitch != 0) {
+                    translatedTriangle.rotateX(pitch);
+                }
+                // origin because everything moves around the camera while the camera actually
+                // stays in place
+                Vec3D cameraRay = Utilities.vecSub(translatedTriangle.vertices[0], new Vec3D(0, 0, 0));
+                // dont draw the triangle if it is facing away from the camera
+                if (Utilities.dotProduct(translatedTriangle.getNormal(), cameraRay) < 0f) {
+                    trianglesToDraw.add(new Triangle[] {translatedTriangle,t});
+                }
+            }
+        }
+        // sort so that we draw the triangles that are closer to the camera last
+        trianglesToDraw.sort(new Comparator<Triangle[]>() {
+            @Override
+            public int compare(Triangle[] t1, Triangle[] t2) {
+                // Get the z position of a random vertex from each triangle
+                float z1 = (t1[0].getVertices()[0].z+t1[0].getVertices()[1].z+t1[0].getVertices()[2].z)/3;
+                float z2 = (t2[0].getVertices()[0].z+t2[0].getVertices()[1].z+t2[0].getVertices()[2].z)/3;
+                // Compare the z positions
+                if (z1 < z2) {
+                    return -1;
+                } else if (z1 < z2) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        });
+        // Draw the triangles
+        for (Triangle[] t : trianglesToDraw) {
+            if(t[0].containsPoint2D(scale, xoffset, yoffset, fov, mouseX, mouseY)){
+                t[1].setSelected(!t[1].isSelected());
+                Main.sketchUpPanel.selectedTriangles.add(t[1]);
+                System.out.println(Main.sketchUpPanel.selectedTriangles.size());
+                return t[0];
+            }
+        }
+        return null;
     }
 
     /**
@@ -119,14 +176,14 @@ public class Utilities {
         return new Triangle(
                 vecAdd(t.vertices[0], translation),
                 vecAdd(t.vertices[1], translation),
-                vecAdd(t.vertices[2], translation));
+                vecAdd(t.vertices[2], translation),t.isSelected());
     }
 
     public static Triangle triangleSubVector(Triangle t, Vec3D translation) {
         return new Triangle(
                 vecSub(t.vertices[0], translation),
                 vecSub(t.vertices[1], translation),
-                vecSub(t.vertices[2], translation));
+                vecSub(t.vertices[2], translation),t.isSelected());
     }
 
     public static Vec3D normaliseVector(Vec3D vector) {
@@ -156,6 +213,7 @@ public class Utilities {
      * @return
      */
     public static Triangle[] clipTriangeletoPlane(Vec3D planePosition, Vec3D planeNormal, Triangle inputTriangle) {
+        boolean selected = inputTriangle.isSelected();
         // normalise plane normal
         planeNormal = Utilities.normaliseVector(planeNormal);
 
@@ -202,7 +260,7 @@ public class Utilities {
             Vec3D intersection2 = Utilities.getIntersection(insidePoints[0], outsidePoints[1], planePosition,
                     planeNormal);
             return new Triangle[] {
-                    new Triangle(insidePoints[0], intersection1, intersection2)
+                    new Triangle(insidePoints[0], intersection1, intersection2, selected)
             };
         }
         if (insidePointCount == 2 && outsidePointCount == 1) {
@@ -215,10 +273,10 @@ public class Utilities {
                     planeNormal);
             return new Triangle[] {
                     // this one gets the both inside points and intersection1
-                    new Triangle(insidePoints[0], insidePoints[1], intersection1),
+                    new Triangle(insidePoints[0], insidePoints[1], intersection1,selected),
                     // woried about the order of this triangle but it gets both intersections and
                     // the second inside point
-                    new Triangle(insidePoints[1], intersection2, intersection1)
+                    new Triangle(insidePoints[1], intersection2, intersection1,selected)
             };
         }
         return null;

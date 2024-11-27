@@ -24,39 +24,87 @@ public class MeshVeiwerPanel extends JPanel {
     JPanel panel = this;
     ArrayList<Mesh> meshes = new ArrayList<Mesh>();
     public float fov = (float) Math.PI * .8f;
+    int X = 0;
+    int Y =0;
+    int clickcount = 0;
 
     public MeshVeiwerPanel() {
         setPreferredSize(new Dimension(1000, 800));
         setBackground(Color.black); // Set the background color to black
 
-        try {
-            Mesh duck = new Mesh("duck.obj", new Vec3D(0, -0.5f, 6f));
-            Mesh mountains = new Mesh("mountains.obj", new Vec3D(0, -10, +15));
-            mountains.rotateY(Math.PI + Math.PI / 3);
-            duck.rotateY(Math.PI / 2);
-            Mesh mainMesh = duck;
+        // try {
+            // Mesh duck = new Mesh("duck.obj", new Vec3D(0, -0.5f, 6f));
+            // Mesh mountains = new Mesh("mountains.obj", new Vec3D(0, -10, +15));
+            // mountains.rotateY(Math.PI + Math.PI / 3);
+            // duck.rotateY(Math.PI / 2);
+            // Mesh mainMesh = duck;
 
-            meshes.add(mainMesh);
-            meshes.add(mountains);
-            meshes.add(new Mesh("teapot.obj", new Vec3D(+6, 1, 5f)));
-            Mesh man = new Mesh("man.obj", new Vec3D(0, -1, 15));
-            man.rotateY(Math.PI);
-            meshes.add(man);
-            camera = new Vec3D(0, 3, 0);
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found");
-        }
+            // meshes.add(mainMesh);
+            // meshes.add(mountains);
+            // meshes.add(new Mesh("teapot.obj", new Vec3D(+6, 1, 5f)));
+            // Mesh man = new Mesh("man.obj", new Vec3D(0, -1, 15));
+            // man.rotateY(Math.PI);
+            // meshes.add(man);
+            // camera = new Vec3D(0, 3, 0);
+        // } catch (FileNotFoundException e) {
+        //     System.out.println("File not found");
+        // }
         setUpKeyBindings();
         requestFocusInWindow();
     }
 
-    public void setUpKeyBindings() {
+
+    public void importMesh(String filename, Vec3D location) {
+        try {
+            meshes.add(new Mesh(filename, location));
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (Exception e) {
+            System.out.println("Invalid input");
+            e.printStackTrace();
+        }
+
+    }
+
+    public void removeMesh(Mesh mesh) {
+        meshes.remove(mesh);
+    }
+
+    public void importMesh(Mesh mesh) {
+        meshes.add(mesh);
+    }
+
+public void setUpKeyBindings() {
         setFocusable(true); // Ensure that the DemoPanel has keyboard focus
         // addMouseListener(new MouseLookController(this));
         // addMouseMotionListener(new MouseLookController());
         KeyboardStatus keyboard = new KeyboardStatus();
         addKeyListener(keyboard);
+        Timer extrudeTimer = new Timer(50, e -> {
+            if (keyboard.isKeyPressed(KeyEvent.VK_CLOSE_BRACKET)) {
+
+                Main.sketchUpPanel.extrudeSelectedTriangles();
+                repaint();
+            }
+            if (keyboard.isKeyPressed(KeyEvent.VK_U)) {
+
+                Main.sketchUpPanel.undo();
+                repaint();
+            }
+        });
+        extrudeTimer.start();
         Timer keyCheckTimer = new Timer(20, e -> {
+            if(keyboard.isKeyPressed(KeyEvent.VK_R)){
+                Main.sketchUpPanel.reset();
+                repaint();
+            }
+            if (keyboard.isKeyPressed(KeyEvent.VK_ESCAPE)) {
+                for(Triangle t: Main.sketchUpPanel.selectedTriangles){
+                    t.setSelected(false);
+                    repaint();
+                }
+                Main.sketchUpPanel.selectedTriangles.clear();
+            }
             if (keyboard.isKeyPressed(KeyEvent.VK_X)) {
                 meshes.get(0).rotateX(Math.PI / 50);
                 repaint();
@@ -141,6 +189,18 @@ public class MeshVeiwerPanel extends JPanel {
             // repaint();
         });
         keyCheckTimer.start();
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                System.out.println("clicked" + clickcount);
+                clickcount++;
+                int mouseX = e.getX();
+                System.out.println(mouseX);
+                int mouseY = e.getY();
+                Utilities.selectTriangle(meshes, 100, getWidth() / 2, getWidth() / 2, yaw, pitch, camera, fov,mouseX,mouseY);
+                repaint();
+            }
+        });
     }
 
     /**
@@ -195,5 +255,6 @@ public class MeshVeiwerPanel extends JPanel {
         g.setColor(Color.black);
         g.fillRect(0, 0, getWidth(), getHeight());
         Utilities.drawMeshes(meshes, 100, getWidth() / 2, getWidth() / 2, yaw, pitch, camera, fov, g);
+        g.setColor(Color.red);
     }
 }
